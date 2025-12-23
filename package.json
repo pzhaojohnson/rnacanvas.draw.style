@@ -1,6 +1,6 @@
 {
   "name": "@rnacanvas/draw.style",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Style drawings",
   "repository": {
     "type": "git",
@@ -29,6 +29,7 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "@rnacanvas/value-check": "^1.14.1",
     "jquery": "^3.7.1"
   }
 }
