@@ -33,6 +33,6 @@ attributes.applyTo(circle);
 circle.getAttribute('stroke'); // "red"
 circle.getAttribute('fill'); // "blue"
 
-// converted to a string
+// non-string values are converted to strings
 circle.getAttribute('stroke-width'); // "2"
 ```
