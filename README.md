@@ -19,6 +19,8 @@ import { SVGElementAttributes } from '@rnacanvas/draw.style';
 
 Represents a collection of attributes that can be applied to SVG elements.
 
+Non-string attribute values are converted to strings.
+
 ```javascript
 var attributes = new SVGElementAttributes({
   'stroke': 'red',
@@ -93,4 +95,28 @@ attributes.set(null);
 attributes.set(true);
 attributes.set(2);
 attributes.set('asdf');
+```
+
+### `applyTo()`
+
+Apply the attributes to a given SVG element.
+
+### `serialized()`
+
+Returns the collection of attributes as a plain object
+(that can be converted to a JSON string, for instance).
+
+```javascript
+var attributes = new SVGElementAttributes({
+  'stroke': 'red',
+  'fill': 'blue',
+  'stroke-width': 2,
+});
+
+// non-string attribute values are converted to strings
+attributes.serialized(); // {
+//   "stroke": "red",
+//   "fill": "blue",
+//   "stroke-width": "2",
+// }
 ```
