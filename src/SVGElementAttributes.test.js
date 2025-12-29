@@ -21,6 +21,24 @@ describe('`class SVGElementAttributes`', () => {
     expect(() => new SVGElementAttributes(true)).not.toThrow();
     expect(() => new SVGElementAttributes(2)).not.toThrow();
     expect(() => new SVGElementAttributes('asdf')).not.toThrow();
+
+    var attributes = new SVGElementAttributes({ 'stroke': undefined, 'fill': 'aliceblue' });
+
+    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    attributes.applyTo(ele);
+
+    // ignores properties with values of undefined
+    expect(ele.getAttribute('stroke')).toBe(null);
+    expect(ele.getAttribute('fill')).toBe('aliceblue');
+
+    var attributes = new SVGElementAttributes({ 'stroke': 'aliceblue', 'fill': null });
+
+    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    attributes.applyTo(ele);
+
+    // ignores properties with values of null
+    expect(ele.getAttribute('stroke')).toBe('aliceblue');
+    expect(ele.getAttribute('fill')).toBe(null);
   });
 
   test('`set()`', () => {
@@ -54,6 +72,22 @@ describe('`class SVGElementAttributes`', () => {
 
     // converts non-string values to strings
     expect(ele.getAttribute('stroke-width')).toBe('8.15');
+
+    attributes.set({ 'stroke-dasharray': undefined });
+
+    attributes.applyTo(ele);
+
+    // ignores properties with values of undefined
+    expect(ele.getAttribute('stroke-dasharray')).toBe(null);
+
+    attributes.set({ 'stroke': null });
+
+    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    attributes.applyTo(ele);
+
+    // properties with values of null result in corresponding attributes being removed
+    expect(ele.getAttribute('stroke')).toBe(null);
+    expect(ele.getAttribute('fill')).toBe('#5bca55');
   });
 
   test('`applyTo()`', () => {

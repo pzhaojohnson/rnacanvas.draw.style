@@ -9,7 +9,9 @@ export class SVGElementAttributes {
   /**
    * Data are supposed to be contained in an attributes data object.
    *
-   * Non-string attribute values are converted to strings.
+   * Data object properties with values of undefined or null are ignored.
+   *
+   * Other non-string values for attributes are converted to strings.
    *
    * This constructor will not throw.
    */
@@ -22,7 +24,11 @@ export class SVGElementAttributes {
   /**
    * Data are supposed to be contained in an attributes data object.
    *
-   * Non-string attribute values are converted to strings.
+   * Data object properties with values of undefined are ignored.
+   *
+   * Properties with values of null result in corresponding attributes being removed.
+   *
+   * Other non-string values for attributes are converted to strings.
    *
    * This method will not throw.
    */
@@ -33,7 +39,13 @@ export class SVGElementAttributes {
 
     if (isNonNullObject(data)) {
       Object.entries(data).forEach(([name, value]) => {
-        this.#attributes[name] = `${value}`;
+        if (value === undefined) {
+          // ignore
+        } else if (value === null) {
+          delete this.#attributes[name];
+        } else {
+          this.#attributes[name] = `${value}`;
+        }
       });
     }
   }
