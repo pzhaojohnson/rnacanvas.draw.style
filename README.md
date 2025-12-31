@@ -158,7 +158,11 @@ Data in invalid formats will be ignored (without throwing).
 
 ### `applyTo()`
 
-Apply the attributes to a given SVG element.
+Applies the attributes to a given SVG element.
+
+Attributes are applied independently of each other
+(e.g., if setting one attribute were to throw an error,
+the setting of other attributes would not be affected).
 
 ### `serialized()`
 
