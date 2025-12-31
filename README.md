@@ -250,6 +250,71 @@ var values = new DrawingElementValues({
 
 All properties must at least be defined at the time of construction.
 
+### `set()`
+
+Sets values (e.g., properties) using a data object.
+
+```javascript
+var values = new DrawingElementValues({
+  basePadding: { isValid: value => typeof value == 'number' },
+  textContent: { isValid: value => typeof value == 'string' },
+});
+
+values.set({
+  basePadding: 5,
+  textContent: 'G,
+});
+
+var ele = { domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text') };
+
+values.applyTo(ele);
+
+ele.basePadding; // 5
+ele.textContent; // "G"
+```
+
+Data object properties with values of `undefined` are ignored,
+as well as invalid property values.
+
+The validator functions specified at construction are used to check property values.
+
+```javascript
+var values = new DrawingElementValues({
+  basePadding: {
+    value: 5,
+    isValid: value => typeof value == 'number',
+  },
+});
+
+values.set({ basePadding: undefined });
+
+// not a number
+values.set({ basePadding: 'asdf' });
+
+values.applyTo(ele);
+
+ele.basePadding; // 5
+```
+
+Unrecognized properties are also ignored.
+
+(All properties must be defined at construction.)
+
+```javascript
+var values = new DrawingElementValues();
+
+// text padding was not defined at construction
+values.set({ textPadding: 10 });
+
+values.applyTo(ele);
+
+'textPadding' in ele; // false
+```
+
+To facilitate the processing of user inputs,
+this method can receive data in any format (without throwing),
+though data in invalid formats will be ignored.
+
 ### `applyTo()`
 
 Applies the values to a drawing element.
