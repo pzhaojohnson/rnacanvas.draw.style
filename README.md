@@ -251,7 +251,7 @@ Applies the values to a drawing element.
 Properties with values of `undefined` are not applied to drawing elements.
 
 Values are applied independently of one another
-(e.g., if setting one propety were to cause an error to be thrown,
+(e.g., if setting one property were to cause an error to be thrown,
 the setting of other properties would not be affected).
 
 This method never throws.
