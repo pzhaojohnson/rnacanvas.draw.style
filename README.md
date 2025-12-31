@@ -335,3 +335,52 @@ Values are applied independently of one another
 the setting of other properties would not be affected).
 
 This method doesn't throw.
+
+### `serialized()`
+
+Returns the values as a plain object
+(e.g., that can be converted to a JSON string
+or input to the `set()` method).
+
+```javascript
+var values = new DrawingElementValues({
+  basePadding: {
+    value: 2,
+    isValid: () => true,
+  },
+  textContent: {
+    value: 'C',
+    isValid: () => true,
+  },
+});
+
+values.serialized(); // {
+//   basePadding: 2,
+//   textContent: "C",
+// }
+```
+
+Properties with unspecified values
+or values of undefined are omitted.
+
+```javascript
+var values = new DrawingElementValues({
+  basePadding: {
+    // no value specified
+    isValid: () => true,
+  },
+  textPadding: {
+    value: undefined,
+    isValid: () => true,
+  },
+  textContent: {
+    value: null,
+    isValid: () => true,
+  },
+});
+
+// only text content is defined
+values.serialized(); // {
+//   textContent: null,
+// }
+```
