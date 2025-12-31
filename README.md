@@ -54,6 +54,45 @@ the `SVGElementAttributes` class constructor is able to receive data in unknown 
 
 Data in invalid formats are ignored (without throwing).
 
+### `has()`
+
+Returns `true` if the queried attribute is present.
+
+```javascript
+var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+
+attributes.has('stroke'); // true
+attributes.has('fill'); // false
+
+attributes.set({ 'fill': 'blue' });
+
+attributes.has('fill'); // true
+
+// remove attribute
+attributes.set({ 'stroke': null });
+
+attributes.has('stroke'); // false
+```
+
+### `get()`
+
+Returns the (string) value of the specified attribute.
+
+Throws if the attribute has not been set.
+
+```javascript
+var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+
+attributes.get('stroke'); // "red"
+
+// attribute not present
+attributes.get('fill'); // throws
+
+attributes.set({ 'fill': 'blue' });
+
+attributes.get('fill'); // "blue"
+```
+
 ### `set()`
 
 Set attributes.
