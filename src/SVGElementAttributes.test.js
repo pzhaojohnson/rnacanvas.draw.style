@@ -41,6 +41,40 @@ describe('`class SVGElementAttributes`', () => {
     expect(ele.getAttribute('fill')).toBe(null);
   });
 
+  test('`has()`', () => {
+    var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+
+    expect(attributes.has('stroke')).toBe(true);
+    expect(attributes.has('fill')).toBe(false);
+
+    attributes.set({ 'fill': 'blue' });
+
+    expect(attributes.has('fill')).toBe(true);
+
+    // remove attribute
+    attributes.set({ 'stroke': null });
+
+    expect(attributes.has('stroke')).toBe(false);
+  });
+
+  test('`get()`', () => {
+    var attributes = new SVGElementAttributes({ 'stroke': '#bba671' });
+
+    expect(attributes.get('stroke')).toBe('#bba671');
+
+    // attribute not present
+    expect(() => attributes.get('fill')).toThrow();
+
+    attributes.set({ 'fill': 'green' });
+
+    expect(attributes.get('fill')).toBe('green');
+
+    // remove attribute
+    attributes.set({ 'stroke': null });
+
+    expect(() => attributes.get('stroke')).toThrow();
+  });
+
   test('`set()`', () => {
     var attributes = new SVGElementAttributes();
 

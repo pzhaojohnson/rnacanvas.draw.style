@@ -9,7 +9,7 @@ export class SVGElementAttributes {
   /**
    * Data are supposed to be contained in an attributes data object.
    *
-   * Data object properties with values of undefined or null are ignored.
+   * Data object properties with values of `undefined` or `null` are ignored.
    *
    * Other non-string values for attributes are converted to strings.
    *
@@ -22,11 +22,31 @@ export class SVGElementAttributes {
   }
 
   /**
+   * Returns `true` if the specified attribute is present.
+   */
+  has(name: string): boolean {
+    return name in this.#attributes;
+  }
+
+  /**
+   * Returns the value of the attribute.
+   *
+   * Throws if the attribute is not present.
+   */
+  get(name: string): string | never {
+    if (name in this.#attributes) {
+      return this.#attributes[name];
+    } else {
+      throw new Error(`SVG element attribute "${name}" has not been set.`);
+    }
+  }
+
+  /**
    * Data are supposed to be contained in an attributes data object.
    *
-   * Data object properties with values of undefined are ignored.
+   * Data object properties with values of `undefined` are ignored.
    *
-   * Properties with values of null result in corresponding attributes being removed.
+   * Properties with values of `null` result in corresponding attributes being removed.
    *
    * Other non-string values for attributes are converted to strings.
    *
