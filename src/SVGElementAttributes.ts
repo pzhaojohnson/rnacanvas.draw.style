@@ -72,7 +72,12 @@ export class SVGElementAttributes {
 
   applyTo(ele: SVGElement): void {
     Object.entries(this.#attributes).forEach(([name, value]) => {
-      ele.setAttribute(name, value);
+      try {
+        ele.setAttribute(name, value);
+      } catch (error: unknown) {
+        console.error(error);
+        console.error(`Unable to set attribute "${name}" to "${value}" on SVG element ${ele}.`);
+      }
     });
   }
 
