@@ -121,7 +121,7 @@ Attributes are to be specified in an object.
 
 Object properties with values of `undefined` are ignored.
 
-However, object property values of `null` result in corresponding attributes being removed.
+However, object properties with values of `null` result in corresponding attributes being removed.
 
 ```javascript
 var attributes = new SVGElementAttributes();
