@@ -67,6 +67,23 @@ export class DrawingElementValues {
       }
     });
   }
+
+  /**
+   * Returns these values as a plain object
+   * (e.g., that can be converted to a JSON string
+   * or input to the `set()` method).
+   */
+  serialized(): NonNullObject {
+    let serialization: NonNullObject = {};
+
+    Object.entries(this.#propertyDefinitions).forEach(([name, definition]) => {
+      if (definition.value !== undefined) {
+        serialization[name] = definition.value;
+      }
+    });
+
+    return serialization;
+  }
 }
 
 interface DrawingElement {

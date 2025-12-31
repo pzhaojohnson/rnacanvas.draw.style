@@ -113,6 +113,33 @@ describe('`class DrawingElementValues`', () => {
     expect(ele.textPadding).toBe(3.5);
     expect(ele.textContent).toBe('C');
   });
+
+  test('`serialized()`', () => {
+    var values = new DrawingElementValues({
+      basePadding: { value: 2.5, isValid: () => true },
+      textPadding: { value: -10, isValid: () => true },
+      textContent: { value: 'G', isValid: () => true },
+    });
+
+    expect(values.serialized()).toStrictEqual({
+      basePadding: 2.5, textPadding: -10, textContent: 'G',
+    });
+
+    var values = new DrawingElementValues({
+      basePadding: { value: undefined, isValid: () => true },
+      textPadding: { isValid: () => true },
+    });
+
+    // omits properties with values of undefined
+    expect(values.serialized()).toStrictEqual({});
+
+    var values = new DrawingElementValues({
+      textContent: { value: null, isValid: () => true },
+    });
+
+    // still includes properties with values of null
+    expect(values.serialized()).toStrictEqual({ textContent: null });
+  });
 });
 
 class DrawingElementMock {
