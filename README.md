@@ -187,7 +187,7 @@ for an RNAcanvas drawing element.
 
 ```typescript
 /**
- * Drawing element interface.
+ * RNAcanvas drawing elements generally follow this interface.
  **/
 interface DrawingElement {
   readonly domNode: SVGElement;
@@ -197,7 +197,7 @@ interface DrawingElement {
 }
 ```
 
-Properties are defined at construction.
+Properties are defined at construction using property definition objects.
 
 ```javascript
 var values = new DrawingElementValues({
@@ -247,3 +247,11 @@ All properties must at least be defined at the time of construction.
 ### `applyTo()`
 
 Applies the values to a drawing element.
+
+Properties with values of `undefined` are not applied to drawing elements.
+
+Values are applied independently of one another
+(e.g., if setting one propety were to cause an error to be thrown,
+the setting of other properties would not be affected).
+
+This method never throws.
