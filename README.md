@@ -188,12 +188,12 @@ attributes.serialized(); // {
 
 ## `class DrawingElementValues`
 
-A collection of values (e.g., properties)
+A collection of values (i.e., attributes and properties)
 for an RNAcanvas drawing element.
 
 ```typescript
 /**
- * RNAcanvas drawing elements generally follow this interface.
+ * RNAcanvas drawing elements generally fulfill this interface.
  **/
 interface DrawingElement {
   readonly domNode: SVGElement;
@@ -203,27 +203,38 @@ interface DrawingElement {
 }
 ```
 
+Attributes are defined at construction using an attributes dictionary sub-object.
+
 Properties are defined at construction using property definition objects.
 
 ```javascript
 var values = new DrawingElementValues({
-  'basePadding': {
-    value: 2,
+  attributes: {
+    'stroke': 'red',
+    'stroke-width': 2,
+  },
+  basePadding: {
+    value: 5,
     isValid: value => typeof value == 'number' && Number.isFinite(value),
   },
 });
 
-var ele = { domNode: document.createElementNS('http://www.w3.org/2000/svg', 'circle') };
-
-ele.basePadding; // undefined
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'circle'),
+};
 
 values.applyTo(ele);
 
-ele.basePadding; // 2
+ele.domNode.getAttribute('stroke'); // "red"
+
+// non-string attribute values are automatically converted to strings
+ele.domNode.getAttribute('stroke-width'); // "2"
+
+ele.basePadding; // 5
 ```
 
 In the example above,
-the `basePadding` property is initialized to a value of `2`.
+the `basePadding` property is initialized to a value of `5`.
 
 The validator function (with key `isValid`)
 enforces that base padding values be numbers and are finite.
@@ -252,7 +263,7 @@ All properties must at least be defined at the time of construction.
 
 ### `set()`
 
-Sets values (e.g., properties) using a data object.
+Sets attributes and properties using a data object.
 
 ```javascript
 var values = new DrawingElementValues({
@@ -269,22 +280,61 @@ var ele = {
 };
 
 values.set({
+  attributes: { 'fill': 'green', 'font-size': 12 },
   basePadding: 5,
   textContent: 'G',
 });
 
 values.applyTo(ele);
 
+ele.domNode.getAttribute('fill'); // "green"
+
+// non-string attribute values are automatically converted to strings
+ele.domNode.getAttribute('font-size'); // "12"
+
 ele.basePadding; // 5
 ele.textContent; // "G"
 ```
 
-Data object properties with values of `undefined` are ignored,
-as well as invalid property values.
+Data object properties and attributes with values of `undefined` are ignored.
 
-The validator functions defined at construction are used to check property values.
+Note that setting an attribute to `null` results in the attribute being removed.
 
 ```javascript
+var values = new DrawingElementValues({
+  attributes: { 'stroke': 'red' },
+});
+
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'circle'),
+};
+
+// remove the stroke attribute
+values.set({
+  attributes: { 'stroke': null },
+});
+
+values.applyTo(ele);
+
+ele.domNode.getAttribute('stroke'); // null
+```
+
+Invalid values for properties are also ignored.
+
+The validator functions provided at construction are used to check property values for validity.
+
+```javascript
+var values = new DrawingElementValues({
+  basePadding: {
+    value: 5,
+    isValid: value => typeof value == 'number',
+  },
+});
+
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+};
+
 // ignored
 values.set({ basePadding: undefined });
 
@@ -293,7 +343,7 @@ values.set({ basePadding: 'asdf' });
 
 values.applyTo(ele);
 
-// is unchanged
+// was not changed
 ele.basePadding; // 5
 ```
 
@@ -331,8 +381,8 @@ Applies the values to a drawing element.
 Properties with values of `undefined` are not applied to drawing elements.
 
 Values are applied independently of one another
-(e.g., if setting one property were to cause an error to be thrown,
-the setting of other properties would not be affected).
+(e.g., if setting one property or attribute were to cause an error to be thrown,
+the setting of other properties and attributes would not be affected).
 
 This method doesn't throw.
 
@@ -344,6 +394,10 @@ or input to the `set()` method).
 
 ```javascript
 var values = new DrawingElementValues({
+  attributes: {
+    'stroke': 'red',
+    'stroke-opacity': 0.25,
+  },
   basePadding: {
     value: 2,
     isValid: () => true,
@@ -354,7 +408,12 @@ var values = new DrawingElementValues({
   },
 });
 
+// non-string attribute values are automatically converted to strings
 values.serialized(); // {
+//   attributes: {
+//     'stroke': "red",
+//     'stroke-opacity': "0.25",
+//   },
 //   basePadding: 2,
 //   textContent: "C",
 // }
@@ -379,8 +438,9 @@ var values = new DrawingElementValues({
   },
 });
 
-// only text content is defined
+// text content is the only property that is defined
 values.serialized(); // {
+//   attributes: {},
 //   textContent: null,
 // }
 ```
