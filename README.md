@@ -164,6 +164,8 @@ Attributes are applied independently of each other
 (e.g., if setting one attribute were to throw an error,
 the setting of other attributes would not be affected).
 
+This method doesn't throw.
+
 ### `serialized()`
 
 Returns the collection of attributes as a plain object
@@ -258,4 +260,4 @@ Values are applied independently of one another
 (e.g., if setting one property were to cause an error to be thrown,
 the setting of other properties would not be affected).
 
-This method never throws.
+This method doesn't throw.
