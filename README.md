@@ -285,17 +285,7 @@ as well as invalid property values.
 The validator functions defined at construction are used to check property values.
 
 ```javascript
-var values = new DrawingElementValues({
-  basePadding: {
-    value: 5,
-    isValid: value => typeof value == 'number',
-  },
-});
-
-var ele = {
-  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
-};
-
+// ignored
 values.set({ basePadding: undefined });
 
 // not a number
@@ -303,6 +293,7 @@ values.set({ basePadding: 'asdf' });
 
 values.applyTo(ele);
 
+// is unchanged
 ele.basePadding; // 5
 ```
 
@@ -321,7 +312,7 @@ var ele = {
   domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
 };
 
-// basePadding is defined (but text padding is not)
+// base padding is defined (but text padding is not)
 values.set({ textPadding: 10 });
 
 values.applyTo(ele);
