@@ -179,3 +179,71 @@ attributes.serialized(); // {
 //   "stroke-width": "2",
 // }
 ```
+
+## `class DrawingElementValues`
+
+A collection of values (e.g., properties)
+for an RNAcanvas drawing element.
+
+```typescript
+/**
+ * Drawing element interface.
+ **/
+interface DrawingElement {
+  readonly domNode: SVGElement;
+
+  // any number of properties
+  // ...
+}
+```
+
+Properties are defined at construction.
+
+```javascript
+var values = new DrawingElementValues({
+  'basePadding': {
+    value: 2,
+    isValid: value => typeof value == 'number' && Number.isFinite(value),
+  },
+});
+
+var ele = { domNode: document.createElementNS('http://www.w3.org/2000/svg', 'circle') };
+
+ele.basePadding; // undefined
+
+values.applyTo(ele);
+
+ele.basePadding; // 2
+```
+
+In the example above,
+the `basePadding` property is initialized to a value of `2`.
+
+The validator function (with key `isValid`)
+enforces that base padding values be numbers and are finite.
+
+The validator function for a property should return a truthy value for valid values
+and a falsy value for invalid values.
+
+The validator function is used to screen values whenever an attempt is made to set a property.
+
+Invalid values are ignored (without throwing)
+when attempting to set properties.
+
+Properties can also be left unspecified (while still being defined)
+at the time of construction.
+
+```javascript
+var values = new DrawingElementValues({
+  textPadding: {
+    // no value specified
+    isValid: value => typeof value == 'number' && Number.isFinite(value),
+  },
+});
+```
+
+All properties must at least be defined at the time of construction.
+
+### `applyTo()`
+
+Applies the values to a drawing element.
