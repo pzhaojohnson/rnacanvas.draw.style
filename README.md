@@ -361,7 +361,7 @@ values.serialized(); // {
 ```
 
 Properties with unspecified values
-or values of undefined are omitted.
+or values of `undefined` are omitted.
 
 ```javascript
 var values = new DrawingElementValues({
