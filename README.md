@@ -264,14 +264,14 @@ var values = new DrawingElementValues({
   },
 });
 
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+};
+
 values.set({
   basePadding: 5,
   textContent: 'G',
 });
-
-var ele = {
-  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
-};
 
 values.applyTo(ele);
 
