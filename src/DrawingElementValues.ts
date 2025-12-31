@@ -1,12 +1,50 @@
 import type { PropertyDefinition } from './PropertyDefinition';
 
+import { isNonNullObject } from '@rnacanvas/value-check';
+
 export class DrawingElementValues {
   #propertyDefinitions: { [name: string]: PropertyDefinition } = {};
 
-  constructor(definitions: { [name: string]: PropertyDefinition }) {
-    Object.entries(definitions).forEach(([name, definition]) => {
-      this.#propertyDefinitions[name] = definition;
-    });
+  constructor(definitions?: { [name: string]: PropertyDefinition }) {
+    if (definitions) {
+      Object.entries(definitions).forEach(([name, definition]) => {
+        this.#propertyDefinitions[name] = definition;
+      });
+    }
+  }
+
+  /**
+   * Values are to be set using a data object.
+   *
+   * Data in invalid formats are ignored (i.e., without throwing).
+   *
+   * Data object properties with values of `undefined` are ignored.
+   *
+   * Unrecognized data object properties are ignored
+   * (all properties must be defined at construction).
+   *
+   * Invalid property values are ignored.
+   *
+   * Property values are checked using the validator functions defined at construction.
+   */
+  set(data: NonNullObject | unknown): void {
+    if (!isNonNullObject(data)) {
+      console.error('Drawing element values data must be specified in an object.');
+    }
+
+    if (isNonNullObject(data)) {
+      Object.entries(data).forEach(([name, value]) => {
+        if (value === undefined) {
+          // ignore
+        } else if (!(name in this.#propertyDefinitions)) {
+          console.error(`Unrecognized property "${name}".`);
+        } else if (!this.#propertyDefinitions[name].isValid(value)) {
+          console.error(`Invalid value ${value} for property "${name}".`);
+        } else {
+          this.#propertyDefinitions[name].value = value;
+        }
+      });
+    }
   }
 
   /**
@@ -34,3 +72,5 @@ export class DrawingElementValues {
 interface DrawingElement {
   readonly domNode: SVGElement;
 }
+
+type NonNullObject = { [name: string]: unknown };
