@@ -256,16 +256,22 @@ Sets values (e.g., properties) using a data object.
 
 ```javascript
 var values = new DrawingElementValues({
-  basePadding: { isValid: value => typeof value == 'number' },
-  textContent: { isValid: value => typeof value == 'string' },
+  basePadding: {
+    isValid: value => typeof value == 'number',
+  },
+  textContent: {
+    isValid: value => typeof value == 'string',
+  },
 });
 
 values.set({
   basePadding: 5,
-  textContent: 'G,
+  textContent: 'G',
 });
 
-var ele = { domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text') };
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+};
 
 values.applyTo(ele);
 
@@ -276,7 +282,7 @@ ele.textContent; // "G"
 Data object properties with values of `undefined` are ignored,
 as well as invalid property values.
 
-The validator functions specified at construction are used to check property values.
+The validator functions defined at construction are used to check property values.
 
 ```javascript
 var values = new DrawingElementValues({
@@ -285,6 +291,10 @@ var values = new DrawingElementValues({
     isValid: value => typeof value == 'number',
   },
 });
+
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+};
 
 values.set({ basePadding: undefined });
 
@@ -301,9 +311,17 @@ Unrecognized properties are also ignored.
 (All properties must be defined at construction.)
 
 ```javascript
-var values = new DrawingElementValues();
+var values = new DrawingElementValues({
+  basePadding: {
+    isValid: value => typeof value == 'number',
+  },
+});
 
-// text padding was not defined at construction
+var ele = {
+  domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
+};
+
+// basePadding is defined (but text padding is not)
 values.set({ textPadding: 10 });
 
 values.applyTo(ele);
