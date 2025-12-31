@@ -280,7 +280,10 @@ var ele = {
 };
 
 values.set({
-  attributes: { 'fill': 'green', 'font-size': 12 },
+  attributes: {
+    'fill': 'green',
+    'font-size': 12,
+  },
   basePadding: 5,
   textContent: 'G',
 });
@@ -321,7 +324,7 @@ ele.domNode.getAttribute('stroke'); // null
 
 Invalid values for properties are also ignored.
 
-The validator functions provided at construction are used to check property values for validity.
+The validator functions defined at construction are used to check property values for validity.
 
 ```javascript
 var values = new DrawingElementValues({
@@ -335,15 +338,12 @@ var ele = {
   domNode: document.createElementNS('http://www.w3.org/2000/svg', 'text'),
 };
 
-// ignored
-values.set({ basePadding: undefined });
-
 // not a number
 values.set({ basePadding: 'asdf' });
 
 values.applyTo(ele);
 
-// was not changed
+// value was not changed
 ele.basePadding; // 5
 ```
 
@@ -420,7 +420,7 @@ values.serialized(); // {
 ```
 
 Properties with unspecified values
-or values of `undefined` are omitted.
+or with a value of `undefined` are omitted.
 
 ```javascript
 var values = new DrawingElementValues({
