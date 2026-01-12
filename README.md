@@ -224,7 +224,7 @@ var attributes = new SVGElementAttributes({
 attributes.serialized(); // {
 //   "stroke": "red",
 //   "stroke-width": "2",
-//   "fill" null,
+//   "fill": null,
 // }
 ```
 
