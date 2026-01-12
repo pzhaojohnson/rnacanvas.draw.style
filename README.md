@@ -71,14 +71,13 @@ circle.getAttribute('stroke-dasharray'); // "1 2 0.5"
 attributes.applyTo(circle);
 
 // attribute removed
-
 circle.getAttribute('stroke-dasharray'); // null
 ```
 
 Attributes should be specified in an object.
 
 However, to facilitate the processing of user inputs,
-the `SVGElementAttributes` class constructor can receive data in invalid formats (without throwing).
+the `SVGElementAttributes` class can receive data in invalid formats (without throwing).
 
 Invalid data are ignored.
 
@@ -90,7 +89,7 @@ Returns `true` if the queried attribute is present.
 var attributes = new SVGElementAttributes({
   'stroke': 'red',
   'fill': null,
-  'fill-opacity: undefined,
+  'fill-opacity': undefined,
 });
 
 attributes.has('stroke'); // true
@@ -118,7 +117,7 @@ attributes.get('stroke'); // "red"
 // value converted to a string
 attributes.get('stroke-opacity'); // "0.25"
 
-attributes.get('fill'); null
+attributes.get('fill'); // null
 
 attributes.get('fill-opacity'); // throws
 attributes.get('r'); // throws
