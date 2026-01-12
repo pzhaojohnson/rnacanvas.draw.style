@@ -50,7 +50,7 @@ circle.setAttribute('stroke-opacity': '0.5');
 attributes.applyTo(circle);
 
 // not changed
-circle.setAttribute('stroke-opacity': '0.5');
+circle.getAttribute('stroke-opacity'); // "0.5"
 ```
 
 Attributes assigned a value of `null`
