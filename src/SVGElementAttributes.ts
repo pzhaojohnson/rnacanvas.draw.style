@@ -4,16 +4,21 @@ import { isNonNullObject } from '@rnacanvas/value-check';
  * Represents a collection of attributes that can be applied to SVG elements.
  */
 export class SVGElementAttributes {
-  #attributes: { [name: string]: string } = {};
+  #attributes: { [name: string]: string | null } = {};
 
   /**
    * Data are supposed to be contained in an attributes data object.
    *
-   * Data object properties with values of `undefined` or `null` are ignored.
+   * Data object properties with values of `undefined` are ignored.
    *
-   * Other non-string values for attributes are converted to strings.
+   * Data object properties with values of `null`
+   * indicate the removal of corresponding attributes
+   * (when this collection of attributes are applied to an SVG element).
    *
-   * This constructor will not throw.
+   * Other non-string attribute values (e.g., numbers) are converted to strings.
+   *
+   * To facilitate the processing of user inputs,
+   * this constructor does not throw.
    */
   constructor(data?: AttributesData | unknown) {
     if (data !== undefined) {
@@ -33,7 +38,7 @@ export class SVGElementAttributes {
    *
    * Throws if the attribute is not present.
    */
-  get(name: string): string | never {
+  get(name: string): string | null | never {
     if (name in this.#attributes) {
       return this.#attributes[name];
     } else {
@@ -46,11 +51,13 @@ export class SVGElementAttributes {
    *
    * Data object properties with values of `undefined` are ignored.
    *
-   * Properties with values of `null` result in corresponding attributes being removed.
+   * Properties with values of `null` result in corresponding attributes being removed
+   * (when this collection of attributes are applied to an SVG element).
    *
-   * Other non-string values for attributes are converted to strings.
+   * Other non-string attribute values (e.g., numbers) are converted to strings.
    *
-   * This method will not throw.
+   * To facilitate the processing of user inputs,
+   * this method does not throw.
    */
   set(data: AttributesData | unknown): void {
     if (!isNonNullObject(data)) {
@@ -62,7 +69,7 @@ export class SVGElementAttributes {
         if (value === undefined) {
           // ignore
         } else if (value === null) {
-          delete this.#attributes[name];
+          this.#attributes[name] = null;
         } else {
           this.#attributes[name] = `${value}`;
         }
@@ -72,11 +79,15 @@ export class SVGElementAttributes {
 
   applyTo(ele: SVGElement): void {
     Object.entries(this.#attributes).forEach(([name, value]) => {
-      try {
-        ele.setAttribute(name, value);
-      } catch (error: unknown) {
-        console.error(error);
-        console.error(`Unable to set attribute "${name}" to "${value}" on SVG element ${ele}.`);
+      if (value === null) {
+        ele.removeAttribute(name);
+      } else {
+        try {
+          ele.setAttribute(name, value);
+        } catch (error: unknown) {
+          console.error(error);
+          console.error(`Unable to set attribute "${name}" to "${value}" on SVG element ${ele}.`);
+        }
       }
     });
   }
@@ -86,7 +97,7 @@ export class SVGElementAttributes {
    * (e.g., that can be converted to a JSON string).
    */
   serialized() {
-    let serialization: { [name: string]: string } = {};
+    let serialization: { [name: string]: string | null } = {};
 
     Object.entries(this.#attributes).forEach(([name, value]) => {
       serialization[name] = value;

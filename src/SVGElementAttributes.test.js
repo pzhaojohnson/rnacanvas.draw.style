@@ -25,54 +25,45 @@ describe('`class SVGElementAttributes`', () => {
     var attributes = new SVGElementAttributes({ 'stroke': undefined, 'fill': 'aliceblue' });
 
     var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
     attributes.applyTo(ele);
 
     // ignores properties with values of undefined
     expect(ele.getAttribute('stroke')).toBe(null);
+
     expect(ele.getAttribute('fill')).toBe('aliceblue');
 
-    var attributes = new SVGElementAttributes({ 'stroke': 'aliceblue', 'fill': null });
+    var attributes = new SVGElementAttributes({ 'fill': null });
 
-    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    expect(ele.getAttribute('fill')).not.toBe(null);
+
     attributes.applyTo(ele);
 
-    // ignores properties with values of null
-    expect(ele.getAttribute('stroke')).toBe('aliceblue');
+    // properties with values of null cause corresponding attributes to be removed
     expect(ele.getAttribute('fill')).toBe(null);
   });
 
   test('`has()`', () => {
-    var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+    var attributes = new SVGElementAttributes({ 'stroke': 'red', 'fill': null, 'stroke-opacity': undefined });
 
     expect(attributes.has('stroke')).toBe(true);
-    expect(attributes.has('fill')).toBe(false);
 
-    attributes.set({ 'fill': 'blue' });
-
+    // has a value of null
     expect(attributes.has('fill')).toBe(true);
 
-    // remove attribute
-    attributes.set({ 'stroke': null });
-
-    expect(attributes.has('stroke')).toBe(false);
+    expect(attributes.has('stroke-opacity')).toBe(false);
+    expect(attributes.has('stroke-dasharray')).toBe(false);
   });
 
   test('`get()`', () => {
-    var attributes = new SVGElementAttributes({ 'stroke': '#bba671' });
+    var attributes = new SVGElementAttributes({ 'stroke': '#bba671', 'stroke-opacity': null });
 
     expect(attributes.get('stroke')).toBe('#bba671');
 
+    expect(attributes.get('stroke-opacity')).toBe(null);
+
     // attribute not present
     expect(() => attributes.get('fill')).toThrow();
-
-    attributes.set({ 'fill': 'green' });
-
-    expect(attributes.get('fill')).toBe('green');
-
-    // remove attribute
-    attributes.set({ 'stroke': null });
-
-    expect(() => attributes.get('stroke')).toThrow();
   });
 
   test('`set()`', () => {
@@ -82,6 +73,20 @@ describe('`class SVGElementAttributes`', () => {
       'stroke': '#44bca8',
       'fill': '#5bca55',
       'stroke-width': 8.15,
+      'stroke-opacity': null,
+      'stroke-dasharray': undefined,
+    });
+
+    expect(attributes.serialized()).toStrictEqual({
+      'stroke': '#44bca8',
+      'fill': '#5bca55',
+
+      // converts value to string
+      'stroke-width': '8.15',
+
+      'stroke-opacity': null,
+
+      // ignores stroke dash array
     });
 
     // empty object
@@ -97,31 +102,13 @@ describe('`class SVGElementAttributes`', () => {
     attributes.set(5);
     attributes.set('qwer');
 
-    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-
-    attributes.applyTo(ele);
-
-    expect(ele.getAttribute('stroke')).toBe('#44bca8');
-    expect(ele.getAttribute('fill')).toBe('#5bca55');
-
-    // converts non-string values to strings
-    expect(ele.getAttribute('stroke-width')).toBe('8.15');
-
-    attributes.set({ 'stroke-dasharray': undefined });
-
-    attributes.applyTo(ele);
-
-    // ignores properties with values of undefined
-    expect(ele.getAttribute('stroke-dasharray')).toBe(null);
-
-    attributes.set({ 'stroke': null });
-
-    var ele = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    attributes.applyTo(ele);
-
-    // properties with values of null result in corresponding attributes being removed
-    expect(ele.getAttribute('stroke')).toBe(null);
-    expect(ele.getAttribute('fill')).toBe('#5bca55');
+    // ignores invalid data
+    expect(attributes.serialized()).toStrictEqual({
+      'stroke': '#44bca8',
+      'fill': '#5bca55',
+      'stroke-width': '8.15',
+      'stroke-opacity': null,
+    });
   });
 
   test('`applyTo()`', () => {
@@ -132,12 +119,21 @@ describe('`class SVGElementAttributes`', () => {
 
     expect(() => attributes.applyTo(ele)).not.toThrow();
 
-    attributes.set({ 'stroke': '#5ba887', 'fill': '#512eef', 'stroke-dasharray': '1 2 0.5' });
+    attributes.set({ 'stroke': '#5ba887', 'stroke-width': 3.5, 'fill': null, 'stroke-dasharray': '1 2 0.5' });
+
+    ele.setAttribute('fill', 'red');
+    expect(ele.getAttribute('fill')).toBe('red');
 
     attributes.applyTo(ele);
 
     expect(ele.getAttribute('stroke')).toBe('#5ba887');
-    expect(ele.getAttribute('fill')).toBe('#512eef');
+
+    // converts value to string
+    expect(ele.getAttribute('stroke-width')).toBe('3.5');
+
+    // removes attribute
+    expect(ele.getAttribute('fill')).toBe(null);
+
     expect(ele.getAttribute('stroke-dasharray')).toBe('1 2 0.5');
   });
 
@@ -147,13 +143,26 @@ describe('`class SVGElementAttributes`', () => {
 
     expect(attributes.serialized()).toStrictEqual({});
 
-    attributes.set({ 'stroke': 'aliceblue', 'stroke-width': 5.1, 'stroke-dasharray': '1 0.5 0.1' });
+    attributes.set({
+      'stroke': 'aliceblue',
+      'stroke-width': 5.1,
+      'stroke-dasharray': '1 0.5 0.1',
+      'fill-opacity': null,
+      'fill': undefined,
+    });
 
-    // converts non-string values to strings
     expect(attributes.serialized()).toStrictEqual({
       'stroke': 'aliceblue',
+
+      // converts value to string
       'stroke-width': '5.1',
+
       'stroke-dasharray': '1 0.5 0.1',
+
+      // includes null values
+      'fill-opacity': null,
+
+      // omits fill attribute
     });
   });
 });
