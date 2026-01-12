@@ -19,78 +19,109 @@ import { SVGElementAttributes } from '@rnacanvas/draw.style';
 
 Represents a collection of attributes that can be applied to SVG elements.
 
-The constructor ignores object properties of `undefined` or `null`.
-
-Non-string attribute values are converted to strings.
-
 ```javascript
 var attributes = new SVGElementAttributes({
   'stroke': 'red',
-  'fill': 'blue',
-  'stroke-opacity': undefined,
-  'stroke-dasharray': null,
   'stroke-width': 2,
 });
+
+// automatically converted to a string
+attributes.get('stroke-width'); // "2"
 
 var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 
 attributes.applyTo(circle);
 
 circle.getAttribute('stroke'); // "red"
-circle.getAttribute('fill'); // "blue"
-
-// ignored
-circle.getAttrbute('stroke-opacity'); // null
-circle.getAttrbute('stroke-dasharray'); // null
-
-// non-string values are converted to strings
 circle.getAttribute('stroke-width'); // "2"
+```
+
+Attributes assigned a value of `undefined` are ignored.
+
+```javascript
+var attributes = new SVGElementAttributes({
+  'stroke-opacity': undefined,
+});
+
+var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
+circle.setAttribute('stroke-opacity': '0.5');
+
+attributes.applyTo(circle);
+
+// not changed
+circle.setAttribute('stroke-opacity': '0.5');
+```
+
+Attributes assigned a value of `null`
+result in corresponding attributes being removed
+when applying to an SVG element.
+
+```javascript
+var attributes = new SVGElementAttributes({
+  'stroke-dasharray': null,
+});
+
+var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
+circle.setAttribute('stroke-dasharray': '1 2 0.5');
+
+circle.getAttribute('stroke-dasharray'); // "1 2 0.5"
+
+attributes.applyTo(circle);
+
+// attribute removed
+
+circle.getAttribute('stroke-dasharray'); // null
 ```
 
 Attributes should be specified in an object.
 
-To facilitate the processing of user inputs,
-the `SVGElementAttributes` class constructor is able to receive data in unknown formats.
+However, to facilitate the processing of user inputs,
+the `SVGElementAttributes` class constructor can receive data in invalid formats (without throwing).
 
-Data in invalid formats are ignored (without throwing).
+Invalid data are ignored.
 
 ### `has()`
 
 Returns `true` if the queried attribute is present.
 
 ```javascript
-var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+var attributes = new SVGElementAttributes({
+  'stroke': 'red',
+  'fill': null,
+  'fill-opacity: undefined,
+});
 
 attributes.has('stroke'); // true
-attributes.has('fill'); // false
-
-attributes.set({ 'fill': 'blue' });
-
 attributes.has('fill'); // true
-
-// remove attribute
-attributes.set({ 'stroke': null });
-
-attributes.has('stroke'); // false
+attributes.has('fill-opacity'); // false
+attributes.has('r'); // false
 ```
 
 ### `get()`
 
-Returns the (string) value of the specified attribute.
+Returns the value of the specified attribute (a string or `null`).
 
 Throws if the attribute has not been set.
 
 ```javascript
-var attributes = new SVGElementAttributes({ 'stroke': 'red' });
+var attributes = new SVGElementAttributes({
+  'stroke': 'red',
+  'stroke-opacity': 0.25,
+  'fill': null,
+  'fill-opacity': undefined,
+});
 
 attributes.get('stroke'); // "red"
 
-// attribute not present
-attributes.get('fill'); // throws
+// value converted to a string
+attributes.get('stroke-opacity'); // "0.25"
 
-attributes.set({ 'fill': 'blue' });
+attributes.get('fill'); null
 
-attributes.get('fill'); // "blue"
+attributes.get('fill-opacity'); // throws
+attributes.get('r'); // throws
 ```
 
 ### `set()`
@@ -102,66 +133,72 @@ var attributes = new SVGElementAttributes();
 
 attributes.set({
   'stroke': 'red',
-  'fill': 'blue',
   'stroke-width': 2,
+  'fill': null,
+  'fill-opacity': undefined,
+});
+
+attributes.get('stroke'); // "red"
+
+// value converted to a string
+attributes.get('stroke-width'); // "2"
+
+attributes.get('fill'); // null
+
+// ignores fill opacity
+attributes.has('fill-opacity'); // false
+```
+
+Attributes are to be specified in an object.
+
+However, to facilitate the processing of user inputs,
+the `set()` method can receive data in invalid formats (without throwing).
+
+Data in invalid formats are ignored.
+
+### `applyTo()`
+
+Applies the attributes to a given SVG element.
+
+```javascript
+var attributes = new SVGElementAttributes({
+  'stroke': 'blue',
+  'stroke-width': 2.5,
 });
 
 var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 
 attributes.applyTo(circle);
 
-circle.getAttribute('stroke'); // "red"
-circle.getAttribute('fill'); // "blue"
+circle.getAttribute('stroke'); // "blue"
 
-// non-string values are converted to strings
-circle.getAttribute('stroke-width'); // "2"
+// converts value to a string
+circle.getAttribute('stroke-width'); // "2.5"
 ```
 
-Attributes are to be specified in an object.
-
-Object properties with values of `undefined` are ignored.
-
-However, object properties with values of `null` result in corresponding attributes being removed.
+Attributes with values of `null`
+result in corresponding attributes being removed
+when applying to an SVG element.
 
 ```javascript
-var attributes = new SVGElementAttributes();
-
-attributes.set({
-  'stroke': 'red',
-  'fill': undefined,
+var attributes = new SVGElementAttributes({
+  'stroke': null,
 });
 
-var circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
 
-attributes.applyTo(circle1);
+circle.setAttribute('stroke', 'red');
 
-circle1.getAttribute('stroke'); // "red"
+circle.getAttribute('stroke'); // "red"
 
-// ignored
-circle1.getAttribute('fill'); // null
+attributes.applyTo(circle);
 
-// remove attribute
-attributes.set({ 'stroke': null });
-
-var circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-
-attributes.applyTo(circle2);
-
-// was removed
-circle1.getAttribute('stroke'); // null
+// attribute was removed
+circle.getAttribute('stroke'); // null
 ```
 
-To facilitate the processing of user inputs,
-the `set()` method can receive data in unknown formats.
-
-Data in invalid formats will be ignored (without throwing).
-
-### `applyTo()`
-
-Applies the attributes to a given SVG element.
-
-Attributes are applied independently of each other
-(e.g., if setting one attribute were to throw an error,
+Attributes are applied independently of one another
+(i.e., if setting one attribute were to throw,
 the setting of other attributes would not be affected).
 
 This method doesn't throw.
@@ -174,15 +211,20 @@ Returns the collection of attributes as a plain object
 ```javascript
 var attributes = new SVGElementAttributes({
   'stroke': 'red',
-  'fill': 'blue',
+
+  // will be converted to a string
   'stroke-width': 2,
+
+  'fill': null,
+
+  // will be omitted
+  'fill-opacity': undefined,
 });
 
-// non-string attribute values are converted to strings
 attributes.serialized(); // {
 //   "stroke": "red",
-//   "fill": "blue",
 //   "stroke-width": "2",
+//   "fill" null,
 // }
 ```
 
